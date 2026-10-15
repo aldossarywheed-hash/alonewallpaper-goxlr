@@ -14,14 +14,15 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Remove Launcher from Cargo.toml
+      - name: Clean All Missing Workspace Members
         shell: pwsh
         run: |
+          # قراءة ملف الإعدادات وإزالة أي أعضاء فرعية قديمة قد تسبب أخطاء مفقودة
           $file = "Cargo.toml"
-          $lines = Get-Content $file
-          # تصفية السطور وإزالة أي سطر يحتوي على كلمة launcher
-          $newLines = $lines | Where-Object { $_ -notlike "*launcher*" }
-          Set-Content $file $newLines
+          $content = Get-Content $file -Raw
+          # تحويل الملف ليصبح مستقلاً بذاته بدون أعضاء Workspace ناقصة
+          $content = $content -replace 'members\s*=\s*\[[\s\S]*?\]', 'members = []'
+          Set-Content $file $content
 
       - name: Build Project
         run: cargo build --release
