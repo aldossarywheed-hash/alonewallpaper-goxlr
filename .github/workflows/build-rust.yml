@@ -14,23 +14,22 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Fix Cargo.toml syntax
+      - name: Clean Workspace Members in Cargo.toml
         shell: pwsh
         run: |
-          # إزالة أي فاصلة زائدة قد تتسبب في خطأ بناء مصفوفة الإعدادات
-          $path = "Cargo.toml"
-          $content = Get-Content -Path $path -Raw
-          # إصلاح الفاصلة الزائدة في المصفوفات
-          $content = $content -replace ',\s*\]', ']'
-          Set-Content -Path $path -Value $content
+          # استبدال سطر الـ launcher في ملف Cargo.toml لكي يتجاهله النظام تماماً
+          $content = Get-Content Cargo.toml -Raw
+          $content = $content -replace '"launcher"', ""
+          $content = $content -replace "'launcher'", ""
+          Set-Content Cargo.toml $content
 
-      - name: Build with Cargo
-        run: cargo build --release
+      - name: Build Project
+        run: cargo build --release --workspace --exclude launcher
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
-          name: goxlr-utility-exe
+          name: goxlr-executable
           path: |
             target/release/*.exe
             target/release/*/*.exe
