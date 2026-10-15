@@ -14,14 +14,15 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Fix Cargo Workspace for Missing Members
+      - name: Fix Cargo.toml syntax
         shell: pwsh
         run: |
-          # قراءة ملف Cargo.toml وإزالة السطر الخاص بـ launcher لكي لا يبحث عنه النظام
-          $content = Get-Content -Path Cargo.toml -Raw
-          $content = $content -replace '"launcher"', ''
-          $content = $content -replace "'launcher'", ''
-          Set-Content -Path Cargo.toml -Value $content
+          # إزالة أي فاصلة زائدة قد تتسبب في خطأ بناء مصفوفة الإعدادات
+          $path = "Cargo.toml"
+          $content = Get-Content -Path $path -Raw
+          # إصلاح الفاصلة الزائدة في المصفوفات
+          $content = $content -replace ',\s*\]', ']'
+          Set-Content -Path $path -Value $content
 
       - name: Build with Cargo
         run: cargo build --release
