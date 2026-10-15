@@ -14,10 +14,20 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Build from Source Directory
+      - name: Remove Virtual Cargo.toml and Build
+        shell: pwsh
         run: |
-          # العثور على مجلد المشروع البنّاء بناءً على محتويات المستودع وبناؤه
-          cargo build --release
+          # حذف ملف Cargo.toml الافتراضي الذي يسبب المشاكل
+          if (Test-Path "Cargo.toml") { Remove-Item "Cargo.toml" }
+          
+          # البحث عن ملف Cargo.toml الحقيقي داخل المجلدات الفرعية ونسخه للخارج
+          $realCargo = Get-ChildItem -Recurse -Filter "Cargo.toml" | Where-Object { $_.DirectoryName -ne $PWD } | Select-Object -First 1
+          if ($realCargo) {
+              Copy-Item $realCargo.FullName -Destination "."
+          }
+
+      - name: Build Project
+        run: cargo build --release
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
