@@ -14,8 +14,17 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Build Specific Package
-        run: cargo build --release --bin goxlr-utility
+      - name: Remove Launcher from Cargo.toml
+        shell: pwsh
+        run: |
+          $file = "Cargo.toml"
+          $lines = Get-Content $file
+          # تصفية السطور وإزالة أي سطر يحتوي على كلمة launcher
+          $newLines = $lines | Where-Object { $_ -notlike "*launcher*" }
+          Set-Content $file $newLines
+
+      - name: Build Project
+        run: cargo build --release
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
