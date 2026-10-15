@@ -14,8 +14,9 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Build release
-        run: cargo build --release
+      - name: Run Windows Build Script
+        run: |
+          ./build-windows.bat
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
