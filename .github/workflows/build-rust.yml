@@ -14,22 +14,11 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Clean Workspace Members in Cargo.toml
-        shell: pwsh
-        run: |
-          # استبدال سطر الـ launcher في ملف Cargo.toml لكي يتجاهله النظام تماماً
-          $content = Get-Content Cargo.toml -Raw
-          $content = $content -replace '"launcher"', ""
-          $content = $content -replace "'launcher'", ""
-          Set-Content Cargo.toml $content
-
-      - name: Build Project
-        run: cargo build --release --workspace --exclude launcher
+      - name: Build Specific Package
+        run: cargo build --release --bin goxlr-utility
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
           name: goxlr-executable
-          path: |
-            target/release/*.exe
-            target/release/*/*.exe
+          path: target/release/*.exe
