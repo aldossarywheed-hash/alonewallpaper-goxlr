@@ -36,3 +36,5 @@ jobs:
           path: |
             target/release/*.exe
             target/release/*/*.exe
+              cargo build --release
+  
