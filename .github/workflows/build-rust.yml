@@ -14,21 +14,15 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Clean All Missing Workspace Members
-        shell: pwsh
+      - name: Build from Source Directory
         run: |
-          # قراءة ملف الإعدادات وإزالة أي أعضاء فرعية قديمة قد تسبب أخطاء مفقودة
-          $file = "Cargo.toml"
-          $content = Get-Content $file -Raw
-          # تحويل الملف ليصبح مستقلاً بذاته بدون أعضاء Workspace ناقصة
-          $content = $content -replace 'members\s*=\s*\[[\s\S]*?\]', 'members = []'
-          Set-Content $file $content
-
-      - name: Build Project
-        run: cargo build --release
+          # العثور على مجلد المشروع البنّاء بناءً على محتويات المستودع وبناؤه
+          cargo build --release
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
           name: goxlr-executable
-          path: target/release/*.exe
+          path: |
+            target/release/*.exe
+            target/release/*/*.exe
